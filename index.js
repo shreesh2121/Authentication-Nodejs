@@ -19,6 +19,7 @@ app.use(express.json());
 // -------------------------------------------------
 
 app.use('/api',require("./Routes/userRoute"))
+app.use('/product',require("./Routes/productRoute"))
 
 const PORT = 7000;
 app.listen(PORT, () => console.log(`Running the server at: ${PORT}`));

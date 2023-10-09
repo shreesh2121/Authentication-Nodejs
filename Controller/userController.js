@@ -1,12 +1,10 @@
-const express = require("express");
-const mongoose = require("mongoose");
 var bcrypt = require("bcryptjs");
-const app = express();
-require("dotenv").config();
+// const app = express();
+// require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { connectDB } = require("../Config/db");
 const { User, userSchema } = require("../Models/register");
-userSchema
+
 
 
 const register=async(req,res)=>{
@@ -49,6 +47,7 @@ const register=async(req,res)=>{
     
           user.token = token;
           user.password = undefined; //now this will not go to the frontend
+          console.log(token);
     
           res.status(201).json(user);
         }
@@ -74,7 +73,7 @@ const login=async(req,res)=>{
           {id:user._id , email:user.email},
           "shhhh", // Use process.env.jwtsecret in production
           {
-            expiresIn: "2h",
+            expiresIn: "30d",
           }
         );
     
@@ -99,4 +98,46 @@ const login=async(req,res)=>{
 }
 
 
-module.exports={register,login}
+// Middleware function to verify JWT tokens
+const verifyToken = (req, res, next) => {
+  // Get the token from the request header, query parameter, or cookie
+  const token = req.header('Authorization');
+  // const token = req.header('Authorization') || req.query.token || req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized - No token provided' });
+  }
+
+  try {
+    // Verify the token with your secret key (replace 'yourSecretKey' with your actual secret)
+    const decoded = jwt.verify(token, 'shhhh');
+
+    // Attach the decoded user information to the request for use in protected routes
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: 'Unauthorized - Invalid token' });
+  }
+};
+
+const protected= async (req, res) => {
+  try {
+   
+    const userIdFromToken= req.user.id;
+
+    // Find the user by ID using Mongoose's findById method
+    const user = await User.findById(userIdFromToken);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // You can now send the user data as the response
+    res.json({ message: 'User found', user });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+
+module.exports={register,login,verifyToken,protected}

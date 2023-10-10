@@ -20,7 +20,10 @@ const productSchema=new mongoose.Schema({
     },
     Img_link: String,
     Rating: Number,
-    
+    user_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User', 
+    }    
 })
 
 // Create a Message model based on the schema

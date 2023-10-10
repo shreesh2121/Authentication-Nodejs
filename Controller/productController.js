@@ -2,18 +2,18 @@ var bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { connectDB } = require("../Config/db");
 const Product = require("../Models/productSchema");
-
+const { verifyToken } = require("./userController");
 const getAllProduct = async (req, res) => {
   const allProducts = await Product.find();
   res.status(201).json(allProducts);
 };
 
-const getOneProduct = async (req, res) => {
-  try {
-  } catch {}
-};
+
 const addProduct = async (req, res) => {
   try {
+    // console.log(req.user);
+    console.log(req.user.id);
+    const userId=req.user.id;
     //get all data from frontend
     const { Productname, Price, Discription, Category, Img_link, Rating } =
       req.body;
@@ -31,6 +31,7 @@ const addProduct = async (req, res) => {
       Category,
       Img_link,
       Rating,
+      user_id:userId,
     });
     res.status(201).json(product);
   } catch (error) {

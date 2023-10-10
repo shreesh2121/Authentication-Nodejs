@@ -114,6 +114,7 @@ const verifyToken = (req, res, next) => {
 
     // Attach the decoded user information to the request for use in protected routes
     req.user = decoded;
+    console.log(decoded);
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized - Invalid token' });
